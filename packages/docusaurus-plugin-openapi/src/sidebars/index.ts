@@ -164,5 +164,5 @@ function groupByTags(
     },
   ];
 
-  return [...intros, ...tagged, ...untagged[0].items];
+  return [...intros, ...tagged, ...untagged];
 }
