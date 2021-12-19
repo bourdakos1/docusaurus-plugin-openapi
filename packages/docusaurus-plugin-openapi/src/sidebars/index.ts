@@ -7,9 +7,9 @@
 
 import path from "path";
 
-import type { PropSidebarItem } from "@docusaurus/plugin-content-docs-types";
 import _ from "lodash";
 
+import type { PropSidebarItem } from "../types";
 import { ApiPageMetadata } from "../types";
 
 interface Options {
