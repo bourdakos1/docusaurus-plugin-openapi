@@ -7,7 +7,7 @@
 
 import path from "path";
 
-import { NavbarItem } from "@docusaurus/theme-common";
+import { PropSidebarItem } from "@docusaurus/plugin-content-docs-types";
 import _ from "lodash";
 
 import { ApiPageMetadata } from "../types";
@@ -45,7 +45,7 @@ type Item = InfoItem | ApiItem;
 export function generateSidebars(
   items: Item[],
   options: Options
-): NavbarItem[] {
+): PropSidebarItem[] {
   const sections = _(items)
     .groupBy((item) => item.source)
     .mapValues((items, source) => {
@@ -55,8 +55,9 @@ export function generateSidebars(
       const info = prototype?.api?.info;
       const fileName = path.basename(source).split(".")[0];
       return {
-        ...options,
-        type: "category",
+        collapsible: options.sidebarCollapsible,
+        collapsed: options.sidebarCollapsed,
+        type: "category" as const,
         label: info?.title || fileName,
         items: groupByTags(items, options),
       };
@@ -74,7 +75,7 @@ export function generateSidebars(
 function groupByTags(
   items: Item[],
   { sidebarCollapsible, sidebarCollapsed }: Options
-) {
+): PropSidebarItem[] {
   const intros = items
     .filter((item) => {
       if (item.type === "info") {
@@ -84,11 +85,10 @@ function groupByTags(
     })
     .map((item) => {
       return {
-        collapsible: options.sidebarCollapsible,
-        collapsed: options.sidebarCollapsed,
-        type: "category" as const,
-        label: info?.title || fileName,
-        items: groupByTags(items, options),
+        type: "link" as const,
+        label: item.title,
+        href: item.permalink,
+        docId: item.id,
       };
     })
     .values()
@@ -145,14 +145,12 @@ function groupByTags(
             const apiPage = item as ApiPageMetadata; // TODO: we should have filtered out all info pages, but I don't like this
             return {
               type: "link" as const,
-              label: apiPage.title,
-              href: apiPage.permalink,
-              docId: apiPage.id,
-              className: clsx({
-                "menu__list-item--deprecated": apiPage.api.deprecated,
-                "api-method": !!apiPage.api.method,
-                [apiPage.api.method]: !!apiPage.api.method,
-              }),
+              label: item.title,
+              href: item.permalink,
+              docId: item.id,
+              className: (item as ApiPageMetadata).api.deprecated // TODO: we should have filtered out all info pages, but I don't like this
+                ? "menu__list-item--deprecated"
+                : undefined,
             };
           }),
       };
@@ -180,7 +178,7 @@ function groupByTags(
         .map((item) => {
           const apiPage = item as ApiPageMetadata; // TODO: we should have filtered out all info pages, but I don't like this
           return {
-            type: "link",
+            type: "link" as const,
             label: item.title,
             href: item.permalink,
             docId: item.id,
