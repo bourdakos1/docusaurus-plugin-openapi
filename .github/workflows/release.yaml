@@ -28,6 +28,8 @@ jobs:
           node-version: "*"
           registry-url: "https://registry.npmjs.org"
       - name: Release
-        run: npx ts-node --transpile-only scripts/publish.ts
+        run: |
+          unset NODE_AUTH_TOKEN
+          npx ts-node --transpile-only scripts/publish.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
